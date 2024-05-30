@@ -4,7 +4,6 @@ const handlers = require('./lib/handlers')
 const bodyParser = require('body-parser')
 
 const app = express()
-app.use(bodyParser.urlencoded({ extended: true }))
 
 // Configure Handlebars view engine
 let handlebars = require('express-handlebars').create({
@@ -21,17 +20,24 @@ app.engine('handlebars', handlebars.engine)
 app.set('view engine', 'handlebars')
 
 const port = process.env.PORT || 3000
-
 app.use(express.static(__dirname + '/public'))
+
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 
 app.use(weatherMiddlware)
 
 // Routes
 app.get('/', handlers.home)
 app.get('/section-test', handlers.sectionTest)
-app.get('/newsletter-signup', handlers.newsletterSignUp)
-app.post('/newsletter-signup/process', handlers.newsletterSignUpProcess)
+// handlers for browser-based form submission
+app.get('/newsletter-signup', handlers.newsletterSignup)
+app.post('/newsletter-signup/process', handlers.newsletterSignupProcess)
 app.get('/newsletter-signup/thank-you', handlers.newsletterSignupThankYou)
+// handlers for fetch/JSON form submission
+app.get('/newsletter', handlers.newsletter)
+app.post('/api/newsletter-signup', handlers.api.newsletterSignup)
+
 
 app.use(handlers.notFound)
 app.use(handlers.serverError)
