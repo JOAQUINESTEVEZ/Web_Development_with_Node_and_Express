@@ -2,6 +2,7 @@ const express = require('express')
 const weatherMiddlware = require('./lib/middleware/weather')
 const handlers = require('./lib/handlers')
 const bodyParser = require('body-parser')
+const multiparty = require('multiparty')
 
 const app = express()
 
@@ -37,7 +38,15 @@ app.get('/newsletter-signup/thank-you', handlers.newsletterSignupThankYou)
 // handlers for fetch/JSON form submission
 app.get('/newsletter', handlers.newsletter)
 app.post('/api/newsletter-signup', handlers.api.newsletterSignup)
-
+//vacation
+app.get('/contest/vacation-photo', handlers.vacationPhotoContest)
+app.post('/api/vacation-photo-contest/:year/:month', (req, res) => {
+  const form = new multiparty.Form()
+  form.parse(req, (err, fields, files) => {
+    if(err) return handlers.api.vacationPhotoContestError(req, res, err.message)
+    handlers.api.vacationPhotoContest(req, res, fields, files)
+  })
+})
 
 app.use(handlers.notFound)
 app.use(handlers.serverError)
